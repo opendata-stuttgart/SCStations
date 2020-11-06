@@ -2,26 +2,29 @@ import leaflet from 'leaflet';
 import hash from 'leaflet-hash';
 import 'leaflet/dist/leaflet.css';
 import './../css/style.css';
-import leafletSidebarV2 from 'leaflet-sidebar-v2';
 
+import api from './feinstaub-api';
+
+let locations;
 
 var map;
 var tiles;
-var cooCenter = [46.256, 17.666];
-var zoomLevel = 5;
+var cooCenter = [48.8564,2.3556];
+var zoomLevel = 14;
 
-var cities =["rennes","tallinn","budapest","prague","dnipro","minsk","fidenza","moscou","dolgoprudny"];
+var radius;
 
+var coo = [];
+//var arrayDistance = [];
 
 window.onload=function(){
 
     map.setView(cooCenter, zoomLevel);
 	map.on('moveend', function() {});
 	map.on('move', function() {});
-	map.on('click', function(e) {
-		map.setView([e.latlng.lat, e.latlng.lng], map.getZoom());
-	});
-    
+//	map.on('click', function(e) {
+//		map.setView([e.latlng.lat, e.latlng.lng], map.getZoom());
+//	});
     
 
 };
@@ -34,15 +37,10 @@ tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 
 new L.Hash(map);
 
+retrieveData();  
 
-var sidebar = L.control.sidebar({
-    autopan: false,       // whether to maintain the centered map point when opening the sidebar
-    closeButton: true,    // whether t add a close button to the panes
-    container: 'sidebar', // the DOM container or #ID of a predefined sidebar container that should be used
-    position: 'left',     // left or right
-}).addTo(map);
 
-fetch("./../json/data.json")
+fetch("./../json/eustations.json")
 .then(function(response) {
 return response.json();
 })
@@ -51,72 +49,25 @@ return response.json();
     var lookup = {};
     var result = [];
 //    console.log(result);
-
-    L.geoJSON(data,{
+    
+    
+         radius = L.geoJSON(data,{
                       pointToLayer: function (feature, latlng) {
-                       return L.circleMarker(latlng, {
-                        radius:5,
-                        fillColor: feature.properties.color,
-                        stroke:true,
-                        weight:2,
-                        color:stations(feature),
-                        fillOpacity: 1})
-                      },
-                      onEachFeature: function (feature, layer) {
-                        
-                          var traficLevel;
-                          var stations;
                           
-                          if (feature.properties.trafic == 0) {traficLevel="low"}else{traficLevel="high"};
-                          if (feature.properties.ostation == 0) {stations = "No official station around" }else if (feature.properties.ostation==1){stations = "Official station around"} else {stations = "N/A"};
-
+//                          cooStations.push(latlng);   
                           
-                        var popupContent = "<h1>#NO2 Campaign 2020</h1><p><b>City</b> : "+feature.properties.city+"</p><p><b>Group</b> : "+feature.properties.group+"</p><p><b>Tube ID</b> : "+feature.properties.id+"</p><p><b>Height</b> : "+feature.properties.height+"</p><p><b>Trafic</b> : "+traficLevel+"</p><p><b>Information</b> : "+feature.properties.info+"<br><br><b>"+stations+"</b></p>";
-                        layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
-                      }}).addTo(map).bringToFront();
-});
-//
-//fetch("./../json/eustations.json")
-//.then(function(response) {
-//return response.json();
-//})
-//.then(function(data) {
-//    
-//    var lookup = {};
-//    var result = [];
-////    console.log(result);
-//
-//    L.geoJSON(data,{
-//                      pointToLayer: function (feature, latlng) {
-//                       return L.circleMarker(latlng, {
-//                        radius:3,
-//                        fillColor: '#808080',
-//                        stroke:false,
-//                        fillOpacity: 1})
-//                      },
-//                      onEachFeature: function (feature, layer) {
-//                        
-//                        var popupContent = "<h1>Official EU Station</h1><p><b>City</b> : "+feature.properties.Name+"</p><p><b>Area Classification</b> : "+feature.properties.AreaClassification+"</p><p><b>Station Classification ID</b> : "+feature.properties.StationClassification+"</p>";
-//                        layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
-//                      }}).addTo(map);
-//});
-
-
-fetch("./../json/eustations_inter.json")
-.then(function(response) {
-return response.json();
-})
-.then(function(data) {
-    
-    var lookup = {};
-    var result = [];
-//    console.log(result);
+                       return L.circle(latlng, {
+                        radius:250,
+                        fillColor: 'blue',
+                        stroke:false,
+                        fillOpacity: 0.2})
+                      }}).addTo(map);
 
     L.geoJSON(data,{
                       pointToLayer: function (feature, latlng) {
                        return L.circleMarker(latlng, {
                         radius:3,
-                        fillColor: '#808080',
+                        fillColor: 'blue',
                         stroke:false,
                         fillOpacity: 1})
                       },
@@ -125,98 +76,72 @@ return response.json();
                         var popupContent = "<h1>Official EU Station</h1><p><b>City</b> : "+feature.properties.Name+"</p><p><b>Area Classification</b> : "+feature.properties.AreaClassification+"</p><p><b>Station Classification ID</b> : "+feature.properties.StationClassification+"</p>";
                         layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
                       }}).addTo(map);
+    
+        
+
+    
+    
 });
 
 
-fetch("./../json/budapeststations.json")
-.then(function(response) {
-return response.json();
-})
-.then(function(data) {
-    
-    var lookup = {};
-    var result = [];
-//    console.log(result);
+document.getElementById("radius").addEventListener("change", updateRadius);
 
-    L.geoJSON(data,{
+
+function retrieveData() {
+		api.getData("https://maps.sensor.community/data/v2/data.dust.min.json").then(function (result) {
+            locations = result;
+          console.log(locations);
+            
+            L.geoJSON(locations,{
                       pointToLayer: function (feature, latlng) {
+                          
+                          coo.push(latlng);
+                          
                        return L.circleMarker(latlng, {
-                        radius:4,
-                        fillColor: '#808080',
-                        stroke:true,
-                        width:1,
-                        color:'#32CD32',
+                        radius:3,
+                        fillColor: 'red',
+                        stroke:false,
                         fillOpacity: 1})
                       },
                       onEachFeature: function (feature, layer) {
+                          
+                           var position;
+                          
+                          if (feature.properties.indoor == 0) {position="outdoor"}else{position="indoor"};
                         
-                        var popupContent = "<h1>Budapest Station</h1><p><b>City</b> : "+feature.properties.Name+"</p><p><b>Area Classification</b> : "+feature.properties.AreaClassification+"</p><p><b>Station Classification ID</b> : "+feature.properties.StationClassification+"</p>";
+                        var popupContent = "<h1>Sensor.Community #"+feature.properties.id+"</h1><p><b>Type</b> : "+feature.properties.type+"</p><p><b>Position</b> : "+position+"</p>";
                         layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
-                      }}).addTo(map);
+                      }
+                
+            
+            
+            }).addTo(map);
 });
-
-
-
-
-
-
-
-
-
-cities.forEach(function(item){
-    
-    var city = item + ".geojson";
-    fetch("./../json/"+city).then(function(response) {
-return response.json();
-})
-.then(function(data) {
-        console.log(data);
-    L.geoJSON(data).addTo(map).bringToBack();
-});   
-});
-
-//
-function stations(feature){    
-    if (feature.properties.ostation == 1) {return "#ff0000" }else {return "transparent"};
+            
 };
 
-
-//AJOUTER LES SATTIONS DANS LES CONVEX HULL
-
-//INFO:
-//
-//https://airindex.eea.europa.eu/Map/AQI/Viewer/current?dt=2020-08-26T08:00:00.000Z&polu=0&stclass=All
-//
-//stclass Non-traffic Traffic
-//
-//polu=0
-//
-//0	"StationCode"
-//1	"SamplingPoint"
-//2	"PollutantId"
-//3	"WorstPollutantId"
-//4	"BandId"
-//5	"WorstBandId"
-//6	"Value"
-//7	"CAMS"
-//8	"Worst"
-//9	"StationClassification"
-//10	"AreaClassification"
-//11	"NormalizedValue"
-//12	"Compliant"
-//13	"NODATA"
-//
-//https://airindex.eea.europa.eu/Map/AQI/Viewer/instant?dt=2020-08-26T05%3A00%3A00.000Z&st=FR33203
-//https://airindex.eea.europa.eu/Map/AQI/Viewer/pie?st=FR33203&polu=0
-//https://airindex.eea.europa.eu/Map/AQI/Viewer/pastDays?st=FR33203&dt=2020-08-26T05%3A00%3A00.000Z
-
-//https://airindex.eea.europa.eu/Map/AQI/Viewer/forecast?dt=2020-08-27T07%3A00%3A00.000Z&polu=0&stclass=All
-
-//https://airindex.eea.europa.eu/Map/AQI/Viewer/current?dt=2020-08-26T13%3A00%3A00.000Z&polu=0&stclass=All
-
-//A VOIR:
-//var pollutants = {"SO2":1,"PM10":192,"PM2.5":246,"O3":352,"NO2":423};
-
-//CALL POUR LES TYPE DE VALEURS
-
-//https://airindex.eea.europa.eu/Map/AQI/Viewer/instant?dt=2020-08-26T12%3A50%3A00.000Z&st=DEBY004
+function updateRadius() {
+    console.log(document.getElementById("radius").value);
+    
+    var value = document.getElementById("radius").value;
+    
+    radius.eachLayer(function (layer) { 
+        
+        
+        
+        layer.setRadius(value);
+        document.getElementById("value").value = value;
+//    //console.log(layer.getLatLng())
+//        
+//        var count = 0;
+//        
+//       // console.log(value)
+//        coo.forEach(function(coo){
+//            if (layer.getLatLng().distanceTo(coo)<=value) {count +=1; }  
+//        });
+//    console.log(count);
+//        
+////    layer.setStyle({fillColor : });
+    });
+    
+};
