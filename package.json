@@ -1,23 +1,26 @@
 {
-  "name": "CDV",
+  "name": "SCRef",
   "version": "1.0.0",
-  "description": "Archives départementales de la Moselle",
+  "description": "Sensors@Ref",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --config webpack.dev.js --mode development",
     "build": "webpack --config webpack.config.js"
   },
-  "homepage": "http://download.codingdavinci.de/index.php/s/CogeyAzf5PzWAyz",
+  "homepage": "https://github.com/pjgueno/SCStations",
   "keywords": [
-    "Carte",
-    "Moselle"
+    "Reference",
+    "Sations"
   ],
   "author": "pjgueno",
   "license": "MIT",
   "dependencies": {
+    "esri-leaflet": "^2.5.1",
+    "esri-leaflet-geocoder": "^2.3.3",
     "geojson": "^0.5.0",
     "leaflet": "^1.6.0",
+    "leaflet-geosearch": "^3.1.0",
     "leaflet-hash": "^0.2.1",
     "lodash": "^4.17.20",
     "webpack": "^4.42.1",

@@ -2,86 +2,77 @@ import leaflet from 'leaflet';
 import hash from 'leaflet-hash';
 import 'leaflet/dist/leaflet.css';
 import './../css/style.css';
+import './../css/esri-leaflet-geocoder.css';
 
 import api from './feinstaub-api';
+import * as esri from 'esri-leaflet'
+import * as esri_geo from 'esri-leaflet-geocoder';
 
 let locations;
-
 var map;
 var tiles;
-var cooCenter = [50.8655,4.3373];
-var zoomLevel = 14;
+var cooCenter = [48.7822,9.1766];
+var zoomLevel = 13;
 
-
-
+var stations;
 var radius;
 var sensors;
 
+var stationsList;
+var sensorsList;
+
+var stationsInBounds;
+var sensorsInBounds;
+
+var circleRadii = new L.layerGroup();
 var coo = [];
-//var arrayDistance = [];
 
+var mapBounds;
 
-var radiusBounds = [];
+var max=0;
+var min=0;
 
 window.onload=function(){
 
     map.setView(cooCenter, zoomLevel);
-	map.on('moveend', function() {});
-	map.on('move', function() {});
-//	map.on('click', function(e) {
-//		map.setView([e.latlng.lat, e.latlng.lng], map.getZoom());
-//	});
+    map.on('move', function() {circleRadii.clearLayers()});
+    map.on('zoom', function() {circleRadii.clearLayers()});
     
-
-};
-
-map = L.map('map',{ zoomControl:true,minZoom:1,doubleClickZoom:false});
-
-tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-			attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
-			maxZoom: 18}).addTo(map);
-
-new L.Hash(map);
-
-  
-
-
-fetch("./../json/eustations.json")
+    
+	map.on('moveend', function() { 
+        console.log('moveend')
+        
+         zoomLevel = map.getZoom();
+        
+        if ((prev == 250 && zoomLevel > 12)||(prev == 1000 && zoomLevel > 9)){
+            
+        boundsCountStations(stations._layers);
+        boundsCountSensors(sensors._layers);
+        countDistance();
+        drawCircles();   
+            
+        };
+        
+                      
+});
+    
+    
+	map.on('zoomend', function() {console.log('zoomend')});
+    
+    fetch("./../json/eustations.json")
 .then(function(response) {
 return response.json();
 })
 .then(function(data) {
     
+    
     var lookup = {};
     var result = [];
-//    console.log(result);
-    
-    
-         radius = L.geoJSON(data,{
-                      pointToLayer: function (feature, latlng) {
-                          
-//                          cooStations.push(latlng);   
-                          
-                       return L.circle(latlng, {
-                        className : 'radius',
-                        radius:250,
-                        fillColor: 'transparent',
-                        stroke:false,
-                        fillOpacity: 0.2})
-                      }}).addTo(map);
-    
-    radius.eachLayer(function (layer) {
-    var boundsObject ={"bounds": layer.getBounds(), "id": layer.feature.properties.Code, "count":0 };
-    layer._path.id = layer.feature.properties.Code;
-    radiusBounds.push(boundsObject);    
-});
-        
-    console.log(radiusBounds);
-    
 
-            L.geoJSON(data,{
+            stations = L.geoJSON(data,{
                       pointToLayer: function (feature, latlng) {
                        return L.circleMarker(latlng, {
+                        className : 'station',
                         radius:3,
                         fillColor: 'blue',
                         stroke:false,
@@ -93,18 +84,11 @@ return response.json();
                         layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
                       }}).addTo(map);
     
-    
-});
-
-retrieveData();
-
-document.getElementById("radius").addEventListener("change", updateRadius);
-
-
-function retrieveData() {
-		api.getData("https://maps.sensor.community/data/v2/data.dust.min.json").then(function (result) {
+            boundsCountStations(stations._layers);
+        
+          		api.getData("https://maps.sensor.community/data/v2/data.dust.min.json").then(function (result) {
             locations = result;
-          console.log(locations);
+//          console.log(locations);
             
           sensors = L.geoJSON(locations,{
                       pointToLayer: function (feature, latlng) {
@@ -128,68 +112,115 @@ function retrieveData() {
                         var popupContent = "<h1>Sensor.Community #"+feature.properties.id+"</h1><p><b>Type</b> : "+feature.properties.type+"</p><p><b>Position</b> : "+position+"</p>";
                         layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
                       }}).addTo(map);
-            
-            
-             sensors.eachLayer(function (layer) {
-                 
-//                 console.log(layer);
-                 
-                 
-                 radiusBounds.forEach(function(e){if (e.bounds.contains(layer._latlng)){
-                     e.count +=1;
-                 }});
-    
-                 
-             });
-            
-           console.log(radiusBounds); 
-            
-            
-            radius.eachLayer(function (layer) {layer.setStyle({fillColor: setColor(layer.feature.properties.Code)})});
-            
-//            radius.setStyle({fillColor: setColor(radiusBounds)});    
-            
+                        
+            boundsCountSensors(sensors._layers);
+            countDistance();
+            drawCircles ();         
+                   
+});      
 });
-      
-            
 };
 
-//
-function setColor(layer){
-    
-//    console.log(data);
-//   console.log(layer);
 
-//    
-    var selectedRadius = radiusBounds.find(e => e.id == layer);
-//   
-//    console.log(selectedRadius[0]);
-//    console.log(selectedRadius[0].count);
-    
-//    0 à 100
-//    
-//    var r, g, b = 0;
-//   
-//	if(selectedRadius.count < 1) {
-//		r = 255;
-//		g = Math.round(5.1 * selectedRadius.count);
-//	}
-//	else {
-//		g = 255;
-//		r = Math.round(510 - 5.10 * selectedRadius.count);
-//	}
-//	var h = r * 0x10000 + g * 0x100 + b * 0x1;
-//    
-//	return '#' + ('000000' + h.toString(16)).slice(-6); 
+map = L.map('map',{ zoomControl:true,minZoom:1,doubleClickZoom:false});
 
-    var max = Math.max.apply(Math, radiusBounds.map(function(o) { return o.count; }))
-    console.log(max);
-    var min = 0;
+tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+			attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+			maxZoom: 18}).addTo(map);
+
+var searchControl = esri_geo.geosearch({useMapBounds:false}).addTo(map);
+
+new L.Hash(map);
+
+circleRadii.addTo(map);
+
+var radios = document.radForm.radius;
+var prev = 250;
+for (var i = 0; i < radios.length; i++) {
+    radios[i].addEventListener('change', function() {
+//        (prev) ? console.log(prev.value): null;
+        if (this !== prev) {
+            prev = this.value;
+            console.log(prev);
+            circleRadii.clearLayers();
+            drawCircles(); 
+        }
+        
+    });
+};
+
+
+
+
+function boundsCountStations (object){
+    var arrayConv = Object.values(object);
+    mapBounds = map.getBounds();
+//    console.log(mapBounds);
+    stationsInBounds = arrayConv.filter(function (e) {if (mapBounds.contains(e._latlng)){return e}});
+    
+    stationsInBounds.forEach(function(e){e.count250 = 0;
+                                        e.count1000 = 0  });
+//    console.log(stationsInBounds); 
+};
+
+
+function boundsCountSensors (object){
+    var arrayConv = Object.values(object);
+    mapBounds = map.getBounds();
+//    console.log(mapBounds);
+    sensorsInBounds = arrayConv.filter(function (e) {if (mapBounds.contains(e._latlng)){return e}});
+//    console.log(sensorsInBounds);
+    
+};
+
+function countDistance (dist){
+    stationsInBounds.forEach(function(e){
+    sensorsInBounds.forEach(function(i){if (i._latlng.distanceTo(e._latlng)<=250){e.count250 +=1};
+                                           if (i._latlng.distanceTo(e._latlng)>250 && i._latlng.distanceTo(e._latlng)<=1000){e.count1000 +=1};
+                                           });
+    });
+    
+
+//    console.log(stationsInBounds);
+    
+};
+
+function drawCircles(){
+    
+    if(prev == 250 && zoomLevel > 12){
+                 max = Math.max.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));
+                min = Math.min.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));   
+    };
+    
+    if(prev == 1000 && zoomLevel > 9){
+           max = Math.max.apply(Math, stationsInBounds.map(function(o) { return o.count1000; }));
+           min = Math.min.apply(Math, stationsInBounds.map(function(o) { return o.count1000; }));
+    };
+    
+    
+    
+    stationsInBounds.forEach(function(e){
+        
+       circleRadii.addLayer( new L.circle(e._latlng, {
+                        className : 'radius',
+                        radius:prev,
+                        fillColor: setColor(e.count250,e.count1000),
+                        stroke:false,
+                        fillOpacity: 0.2}));
+        
+    });
+        
+};
+
+function setColor(val1,val2){
+    
     var base = (max - min);
     
-     var perc = selectedRadius.count;
-
-            if (base == 0) { perc = 100; }
+    if (prev == 250) {var perc = val1;};
+    if (prev == 1000) {var perc = val2;};
+    
+            if (base == 0 && max!= 0) { perc = 100; }
+            else if (base == 0 && max== 0) { perc = 0; }
             else {
                 perc = (perc - min) / base * 100; 
             }
@@ -203,113 +234,5 @@ function setColor(layer){
                 r = Math.round(510 - 5.10 * perc);
             }
             var h = r * 0x10000 + g * 0x100 + b * 0x1;
-            return '#' + ('000000' + h.toString(16)).slice(-6);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-};
-
-
-//function (layer){
-//                return "red";
-//                
-
-
-
-//function getMax(arr) {
-//    var max;
-//    for (var i=0 ; i<arr.length ; i++) {
-//        if (max == null || parseInt(arr[i].count) > parseInt(max[prop]))
-//            max = arr[i];
-//    }
-//    return max;
-//}
-
-
-function perc2color(perc) {
-	var r, g, b = 0;
-	if(perc < 50) {
-		r = 255;
-		g = Math.round(5.1 * perc);
-	}
-	else {
-		g = 255;
-		r = Math.round(510 - 5.10 * perc);
-	}
-	var h = r * 0x10000 + g * 0x100 + b * 0x1;
-	return '#' + ('000000' + h.toString(16)).slice(-6);
-};
-
-
-
-function updateRadius() {
-    console.log(document.getElementById("radius").value);
-    
-    var value = document.getElementById("radius").value;
-    
-//    radiusBounds = [];
-    
-    radius.eachLayer(function (layer) { 
-        
-        layer.setRadius(value);
-        document.getElementById("value").value = value;
-        
-//        console.log(radiusBounds.find(e => e.id == layer.feature.properties.Code));
-        
-        radiusBounds.find(e => e.id == layer.feature.properties.Code).bounds = layer.getBounds();
-        radiusBounds.find(e => e.id == layer.feature.properties.Code).count = 0;
-        
-    });
-    
-    
-    sensors.eachLayer(function (layer) {
-                 
-//                 console.log(layer);
-                           
-     radiusBounds.forEach(function(e){if (e.bounds.contains(layer._latlng)){
-         e.count +=1;
-     }});
-
-
- });
-    
-    
-radius.eachLayer(function (layer) {layer.setStyle({fillColor: setColor(layer.feature.properties.Code)})});
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-//    radius.eachLayer(function (layer) {
-//    var boundsObject ={"bounds": layer.getBounds(), "id": layer.feature.properties.Code, "count":0 };
-//    layer._path.id = layer.feature.properties.Code;
-//    radiusBounds.push(boundsObject);    
-//});
-    
-    
-    
-//    radius.eachLayer(function (layer) {layer.setStyle({fillColor: setColor(radiusBounds,layer.feature.properties.Code)})});
-
-    
+            return '#' + ('000000' + h.toString(16)).slice(-6); 
 };
