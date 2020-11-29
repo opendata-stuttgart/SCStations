@@ -2,7 +2,9 @@ import leaflet from 'leaflet';
 import hash from 'leaflet-hash';
 import 'leaflet/dist/leaflet.css';
 import './../css/style.css';
-import './../css/esri-leaflet-geocoder.css';
+//import './../css/esri-leaflet-geocoder.css';
+
+import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
 
 import api from './feinstaub-api';
 import * as esri from 'esri-leaflet'
@@ -11,8 +13,8 @@ import * as esri_geo from 'esri-leaflet-geocoder';
 let locations;
 var map;
 var tiles;
-var cooCenter = [48.7822,9.1766];
-var zoomLevel = 13;
+var cooCenter = [50.9414,6.9589];
+var zoomLevel = 14;
 
 var stations;
 var radius;
@@ -50,6 +52,8 @@ window.onload=function(){
         boundsCountSensors(sensors._layers);
         countDistance();
         drawCircles();   
+        stations.bringToFront();
+        sensors.bringToFront();
             
         };
         
@@ -115,7 +119,9 @@ return response.json();
                         
             boundsCountSensors(sensors._layers);
             countDistance();
-            drawCircles ();         
+            drawCircles ();  
+            stations.bringToFront();
+            sensors.bringToFront();
                    
 });      
 });
@@ -176,7 +182,7 @@ function boundsCountSensors (object){
 function countDistance (dist){
     stationsInBounds.forEach(function(e){
     sensorsInBounds.forEach(function(i){if (i._latlng.distanceTo(e._latlng)<=250){e.count250 +=1};
-                                           if (i._latlng.distanceTo(e._latlng)>250 && i._latlng.distanceTo(e._latlng)<=1000){e.count1000 +=1};
+                                           if (i._latlng.distanceTo(e._latlng)<=1000){e.count1000 +=1};
                                            });
     });
     
@@ -206,8 +212,11 @@ function drawCircles(){
                         radius:prev,
                         fillColor: setColor(e.count250,e.count1000),
                         stroke:false,
-                        fillOpacity: 0.2}));
+                        fillOpacity: 0.2})
+                        .bindPopup(popupMaker(e._latlng))
+                           );
         
+//        bringToBack()
     });
         
 };
@@ -215,17 +224,23 @@ function drawCircles(){
 function setColor(val1,val2){
     
     var base = (max - min);
+    var percCal;
     
     if (prev == 250) {var perc = val1;};
     if (prev == 1000) {var perc = val2;};
     
-            if (base == 0 && max!= 0) { perc = 100; }
-            else if (base == 0 && max== 0) { perc = 0; }
+//    REVOIR!!!
+    
+            if (base == 0 && max!= 0  && min!=0) { console.log('cas1'); perc = 100;}
+            else if (base == 0 && max== 0) { console.log('cas2');perc = 0; }
             else {
+                console.log('cas3');
                 perc = (perc - min) / base * 100; 
             }
+    
             var r, g, b = 0;
-            if (perc < 1) {
+    
+            if (perc == 0) {
                 r = 255;
                 g = Math.round(5.1 * perc);
             }
@@ -234,5 +249,34 @@ function setColor(val1,val2){
                 r = Math.round(510 - 5.10 * perc);
             }
             var h = r * 0x10000 + g * 0x100 + b * 0x1;
+            console.log('#' + ('000000' + h.toString(16)).slice(-6));
             return '#' + ('000000' + h.toString(16)).slice(-6); 
+};
+
+function popupMaker(coo){
+    
+    var filtered = sensorsInBounds.filter(function(i){
+        
+        if (prev == 250){
+            if (i._latlng.distanceTo(coo)<=250){return i};
+        };
+        
+        if (prev == 1000){
+           if (i._latlng.distanceTo(coo)<=1000){return i};   
+        };
+        
+        
+    })
+    
+    console.log(filtered);
+    
+    var texte1 ="<table><tr><th>S.C Sensors in " + prev + " m radius</th></tr>";
+    
+    filtered.forEach(function(e,i,a){
+        
+        if (i < (a.length -1)) {var texte2 = "<tr><td>" + e.feature.properties.id + "</td></tr>"};
+        if (i == (a.length -1)) {var texte2 = "<tr><td>" + e.feature.properties.id + "</td></tr></table>"};
+        texte1 += texte2});
+    console.log(texte1);
+    return texte1;
 };
