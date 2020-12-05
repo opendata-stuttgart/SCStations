@@ -22,6 +22,7 @@
     "leaflet": "^1.6.0",
     "leaflet-geosearch": "^3.1.0",
     "leaflet-hash": "^0.2.1",
+    "leaflet-mouse-position": "^1.2.0",
     "lodash": "^4.17.20",
     "webpack": "^4.42.1",
     "whatwg-fetch": "^3.4.1"

@@ -9,6 +9,8 @@ import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
 import api from './feinstaub-api';
 import * as esri from 'esri-leaflet'
 import * as esri_geo from 'esri-leaflet-geocoder';
+import "leaflet-mouse-position";
+
 
 let locations;
 var map;
@@ -137,6 +139,8 @@ tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 var searchControl = esri_geo.geosearch({useMapBounds:false}).addTo(map);
 
 new L.Hash(map);
+
+L.control.mousePosition().addTo(map);
 
 circleRadii.addTo(map);
 
