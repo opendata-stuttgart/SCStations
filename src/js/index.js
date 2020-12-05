@@ -37,8 +37,8 @@ var min=0;
 window.onload=function(){
 
     map.setView(cooCenter, zoomLevel);
-    map.on('move', function() {circleRadii.clearLayers()});
-    map.on('zoom', function() {circleRadii.clearLayers()});
+    map.on('move', function() {document.getElementById('legend').style.visibility = 'hidden'; circleRadii.clearLayers()});
+    map.on('zoom', function() {document.getElementById('legend').style.visibility = 'hidden'; circleRadii.clearLayers()});
     
     
 	map.on('moveend', function() { 
@@ -54,7 +54,7 @@ window.onload=function(){
         drawCircles();   
         stations.bringToFront();
         sensors.bringToFront();
-            
+        document.getElementById('legend').style.visibility = 'visible';
         };
         
                       
@@ -148,6 +148,7 @@ for (var i = 0; i < radios.length; i++) {
         if (this !== prev) {
             prev = this.value;
             console.log(prev);
+            document.getElementById('legend').style.visibility = 'hidden'
             circleRadii.clearLayers();
             drawCircles(); 
         }
@@ -196,6 +197,7 @@ function drawCircles(){
     if(prev == 250 && zoomLevel > 12){
                  max = Math.max.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));
                 min = Math.min.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));   
+        
     };
     
     if(prev == 1000 && zoomLevel > 9){
@@ -204,6 +206,13 @@ function drawCircles(){
     };
     
     
+    if((prev == 1000 && zoomLevel > 9) || (prev == 250 && zoomLevel > 12)  ){
+    
+    document.getElementById('legend').style.visibility = 'visible';
+    
+    document.getElementById('min').innerHTML= min;
+    document.getElementById('max').innerHTML= max;
+    
     
     stationsInBounds.forEach(function(e){
         
@@ -211,13 +220,17 @@ function drawCircles(){
                         className : 'radius',
                         radius:prev,
                         fillColor: setColor(e.count250,e.count1000),
-                        stroke:false,
-                        fillOpacity: 0.2})
+                        stroke:true,
+                        color:setColor(e.count250,e.count1000),
+                        opacity:1,
+                        weight :1,
+                        fillOpacity: 0.3})
                         .bindPopup(popupMaker(e._latlng))
                            );
         
 //        bringToBack()
     });
+    };
         
 };
 
@@ -256,19 +269,15 @@ function setColor(val1,val2){
 function popupMaker(coo){
     
     var filtered = sensorsInBounds.filter(function(i){
-        
-        if (prev == 250){
-            if (i._latlng.distanceTo(coo)<=250){return i};
-        };
-        
-        if (prev == 1000){
-           if (i._latlng.distanceTo(coo)<=1000){return i};   
-        };
-        
-        
+        if (prev == 250){if (i._latlng.distanceTo(coo)<=250){return i};};
+        if (prev == 1000){if (i._latlng.distanceTo(coo)<=1000){return i};};
     })
     
     console.log(filtered);
+    
+    if (filtered.length == 0){return 'No S.C Sensor in radius'}
+    
+    else{
     
     var texte1 ="<table><tr><th>S.C Sensors in " + prev + " m radius</th></tr>";
     
@@ -277,6 +286,7 @@ function popupMaker(coo){
         if (i < (a.length -1)) {var texte2 = "<tr><td>" + e.feature.properties.id + "</td></tr>"};
         if (i == (a.length -1)) {var texte2 = "<tr><td>" + e.feature.properties.id + "</td></tr></table>"};
         texte1 += texte2});
-    console.log(texte1);
+//    console.log(texte1);
     return texte1;
+    };
 };

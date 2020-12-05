@@ -1,5 +1,8 @@
 body { height: 100%;
     width:100%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 15px;
         }    
 
 .app {
@@ -32,12 +35,81 @@ img.leaflet-tile{
 }
 
 .radiocontainer{
-    width:300px;
-    height:300px;
-    bottom: 20px;
-    left: 20px;
+    width:100px;
+    height:270px;
+    bottom: 0px;
+    left: 0px;
     position: absolute;
     z-index: 1200;
-/*    display: block;*/
+    background-color: white;
 
+}
+
+
+#legend{visibility: visible;}
+
+
+#legend-inner {
+        position: fixed;
+        left: 30px;
+        bottom: 20px;
+        z-index: 1001;
+        pointer-events: none;
+        height: 130px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        }
+
+#legend-inner .gradient {
+        opacity: 0.8;
+        width: 20px;
+    
+    background: -webkit-linear-gradient(bottom, #ff0000 0%, #ffff00 50%, #00ff00 100%);
+    
+    background: linear-gradient(to top, #ff0000 0%,#ffff00 50%,#00ff00 100%);
+    
+    position: relative;
+        }
+
+#legend-inner .gradient .limit {
+        height: 2px;
+        width: 42px;
+        background-color: #d50000;
+        position: absolute;
+        left: -10px;
+        bottom: calc(40% - 1px);
+        }
+
+#legend-inner .labels {
+        width: 150px;
+        position: relative;
+        }
+
+#legend-inner .labels .label {
+        position: absolute;
+        -webkit-transform: translateY(50%);
+        transform: translateY(50%);
+        }
+
+#legend-inner .labels .label:before {
+        content: '\2013   ';
+        }
+
+#cercle1 {
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background: blue;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+#cercle2 {
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background: red;
+    margin-left: 10px;
+    display: inline-block;
 }
