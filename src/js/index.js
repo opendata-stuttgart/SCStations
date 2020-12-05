@@ -151,6 +151,8 @@ for (var i = 0; i < radios.length; i++) {
             document.getElementById('legend').style.visibility = 'hidden'
             circleRadii.clearLayers();
             drawCircles(); 
+        stations.bringToFront();
+        sensors.bringToFront();
         }
         
     });
