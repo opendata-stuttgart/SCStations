@@ -2,7 +2,6 @@ import leaflet from 'leaflet';
 import hash from 'leaflet-hash';
 import 'leaflet/dist/leaflet.css';
 import './../css/style.css';
-//import './../css/esri-leaflet-geocoder.css';
 
 import 'esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css'
 
@@ -16,7 +15,7 @@ let locations;
 var map;
 var tiles;
 var cooCenter = [50.9414,6.9589];
-var zoomLevel = 14;
+var zoomLevel = 15;
 
 var stations;
 var radius;
@@ -39,6 +38,7 @@ var min=0;
 window.onload=function(){
 
     map.setView(cooCenter, zoomLevel);
+    
     map.on('move', function() {document.getElementById('legend').style.visibility = 'hidden'; circleRadii.clearLayers()});
     map.on('zoom', function() {document.getElementById('legend').style.visibility = 'hidden'; circleRadii.clearLayers()});
     
@@ -48,7 +48,7 @@ window.onload=function(){
         
          zoomLevel = map.getZoom();
         
-        if ((prev == 250 && zoomLevel > 12)||(prev == 1000 && zoomLevel > 9)){
+        if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){
             
         boundsCountStations(stations._layers);
         boundsCountSensors(sensors._layers);
@@ -56,9 +56,8 @@ window.onload=function(){
         drawCircles();   
         stations.bringToFront();
         sensors.bringToFront();
-        document.getElementById('legend').style.visibility = 'visible';
         };
-        
+     
                       
 });
     
@@ -66,14 +65,13 @@ window.onload=function(){
 	map.on('zoomend', function() {console.log('zoomend')});
     
     fetch("./../json/eustations.json")
-.then(function(response) {
-return response.json();
-})
-.then(function(data) {
-    
-    
-    var lookup = {};
-    var result = [];
+        .then(function(response) {
+        return response.json();
+        })
+        .then(function(data) {
+
+            var lookup = {};
+            var result = [];
 
             stations = L.geoJSON(data,{
                       pointToLayer: function (feature, latlng) {
@@ -93,9 +91,7 @@ return response.json();
             boundsCountStations(stations._layers);
         
           		api.getData("https://maps.sensor.community/data/v2/data.dust.min.json").then(function (result) {
-            locations = result;
-//          console.log(locations);
-            
+            locations = result;            
           sensors = L.geoJSON(locations,{
                       pointToLayer: function (feature, latlng) {
                           
@@ -124,7 +120,10 @@ return response.json();
             drawCircles ();  
             stations.bringToFront();
             sensors.bringToFront();
-                   
+            
+            document.getElementById("loading_layer").style.display ="none";
+            document.getElementById("radiocontainer").style.display ="block";
+                                
 });      
 });
 };
@@ -136,7 +135,7 @@ tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 			attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
 			maxZoom: 18}).addTo(map);
 
-var searchControl = esri_geo.geosearch({useMapBounds:false}).addTo(map);
+var searchControl = esri_geo.geosearch({useMapBounds:false, zoomToResult:true}).addTo(map);
 
 new L.Hash(map);
 
@@ -148,7 +147,6 @@ var radios = document.radForm.radius;
 var prev = 250;
 for (var i = 0; i < radios.length; i++) {
     radios[i].addEventListener('change', function() {
-//        (prev) ? console.log(prev.value): null;
         if (this !== prev) {
             prev = this.value;
             console.log(prev);
@@ -163,28 +161,23 @@ for (var i = 0; i < radios.length; i++) {
 };
 
 
-
+ document.getElementById("menu").addEventListener("click", toggleSidebar); 
 
 function boundsCountStations (object){
     var arrayConv = Object.values(object);
     mapBounds = map.getBounds();
-//    console.log(mapBounds);
     stationsInBounds = arrayConv.filter(function (e) {if (mapBounds.contains(e._latlng)){return e}});
     
     stationsInBounds.forEach(function(e){e.count250 = 0;
                                         e.count1000 = 0  });
-//    console.log(stationsInBounds); 
-};
+}
 
 
 function boundsCountSensors (object){
     var arrayConv = Object.values(object);
     mapBounds = map.getBounds();
-//    console.log(mapBounds);
-    sensorsInBounds = arrayConv.filter(function (e) {if (mapBounds.contains(e._latlng)){return e}});
-//    console.log(sensorsInBounds);
-    
-};
+    sensorsInBounds = arrayConv.filter(function (e) {if (mapBounds.contains(e._latlng)){return e}});    
+}
 
 function countDistance (dist){
     stationsInBounds.forEach(function(e){
@@ -192,34 +185,43 @@ function countDistance (dist){
                                            if (i._latlng.distanceTo(e._latlng)<=1000){e.count1000 +=1};
                                            });
     });
-    
-
-//    console.log(stationsInBounds);
-    
-};
+}
 
 function drawCircles(){
     
-    if(prev == 250 && zoomLevel > 12){
-                 max = Math.max.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));
-                min = Math.min.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));   
+    if(prev == 250 && zoomLevel > 14){
+        
+        console.log(stationsInBounds);
+            max = Math.max.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));
+            min = Math.min.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));   
+        
+        console.log(min + ' ' +max);
         
     };
     
-    if(prev == 1000 && zoomLevel > 9){
+    if(prev == 1000 && zoomLevel > 12){
+        
+        console.log(stationsInBounds);
+        
            max = Math.max.apply(Math, stationsInBounds.map(function(o) { return o.count1000; }));
            min = Math.min.apply(Math, stationsInBounds.map(function(o) { return o.count1000; }));
+        
+        console.log(min + ' ' +max);
     };
     
     
-    if((prev == 1000 && zoomLevel > 9) || (prev == 250 && zoomLevel > 12)  ){
+    if(((prev == 1000 && zoomLevel > 12) || (prev == 250 && zoomLevel > 14)) && (Math.abs(min) !== Infinity || Math.abs(max) !== Infinity)){
+        
+    console.log("CALLED");
     
     document.getElementById('legend').style.visibility = 'visible';
-    
-    document.getElementById('min').innerHTML= min;
-    document.getElementById('max').innerHTML= max;
-    
-    
+        
+if (min !== 0 && min === max ){document.getElementById('min').innerHTML= "&emsp;";}else{ document.getElementById('min').innerHTML= "&emsp;" + min;}; 
+            
+   
+        
+ if (max!== 0){document.getElementById('max').innerHTML= "&emsp;" + max;}else{document.getElementById('max').innerHTML= "&emsp;";}; 
+        
     stationsInBounds.forEach(function(e){
         
        circleRadii.addLayer( new L.circle(e._latlng, {
@@ -234,11 +236,10 @@ function drawCircles(){
                         .bindPopup(popupMaker(e._latlng))
                            );
         
-//        bringToBack()
     });
     };
         
-};
+}
 
 function setColor(val1,val2){
     
@@ -250,10 +251,10 @@ function setColor(val1,val2){
     
 //    REVOIR!!!
     
-            if (base == 0 && max!= 0  && min!=0) { console.log('cas1'); perc = 100;}
-            else if (base == 0 && max== 0) { console.log('cas2');perc = 0; }
+            if (base == 0 && max!= 0  && min!=0) { console.log('min=max'); perc = 100;}
+            else if (base == 0 && max== 0) { console.log('min=max=0');perc = 0; }
             else {
-                console.log('cas3');
+                console.log('calculate');
                 perc = (perc - min) / base * 100; 
             }
     
@@ -268,9 +269,8 @@ function setColor(val1,val2){
                 r = Math.round(510 - 5.10 * perc);
             }
             var h = r * 0x10000 + g * 0x100 + b * 0x1;
-            console.log('#' + ('000000' + h.toString(16)).slice(-6));
             return '#' + ('000000' + h.toString(16)).slice(-6); 
-};
+}
 
 function popupMaker(coo){
     
@@ -292,7 +292,24 @@ function popupMaker(coo){
         if (i < (a.length -1)) {var texte2 = "<tr><td>" + e.feature.properties.id + "</td></tr>"};
         if (i == (a.length -1)) {var texte2 = "<tr><td>" + e.feature.properties.id + "</td></tr></table>"};
         texte1 += texte2});
-//    console.log(texte1);
     return texte1;
     };
-};
+}
+
+function openSidebar() {
+	document.getElementById("menu").innerHTML = "&#10006;";
+	document.getElementById("sidebar").style.display = "block";
+}
+
+function closeSidebar() {
+	document.getElementById("menu").innerHTML = "&#9776;";
+	document.getElementById("sidebar").style.display = "none";
+}
+
+function toggleSidebar() {
+	if (document.getElementById("sidebar").style.display === "block") {
+		closeSidebar();
+	} else {
+		openSidebar()
+	}
+}
