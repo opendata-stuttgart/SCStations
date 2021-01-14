@@ -3,7 +3,11 @@ body { height: 100%;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
     font-size: 15px;
-        }    
+        }  
+
+h1 {
+    font-size: 15px;
+}
 
 .app {
 	height: 100%;
@@ -37,7 +41,7 @@ body { height: 100%;
  
 
 .leaflet-popup-content-wrapper{
-    width: 300px;
+    width: 250px;
     height:auto;
 }
 
@@ -191,7 +195,7 @@ img.leaflet-tile {
 @media screen and (max-width: 600px) {
 
 .leaflet-popup-content-wrapper{
-    width: 300px;
+    width: 250px;
     height:auto;
 }
 
