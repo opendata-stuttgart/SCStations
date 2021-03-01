@@ -24,7 +24,6 @@
     "leaflet-hash": "^0.2.1",
     "leaflet-mouse-position": "^1.2.0",
     "lodash": "^4.17.20",
-    "webpack": "^4.42.1",
     "whatwg-fetch": "^3.4.1"
   },
   "devDependencies": {
@@ -35,8 +34,12 @@
     "mini-css-extract-plugin": "^0.6.0",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "style-loader": "^0.23.1",
-    "webpack": "^4.29.6",
+    "webpack": "^4.29.0",
     "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.2.1"
+    "webpack-dev-server": "^3.11.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjgueno/SCStations.git"
   }
 }
