@@ -1,53 +1,55 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <title>Sensor.Community - Stations & Sensors</title>
 </head>
 
 <body>
-    
-	<span id="menu">&#9776;</span>
-	<div id="loading_layer"><div id="loading">Loading data...</div></div>
-    <div id="sidebar" style="display: none;">
-		<div id="explanation">This map was build to allow Sensor.Community users to find the best location for a new sensor according to researchers in the Netherlands.<br><br>They are currently building a correction algorithm based on the measurements both of official stations and citizen sensors in a radius of 250 m or 1000 m.<br><br>You can look for your city or your street in the search engine and then zoom in or zoom out to set the map correctly.<br><br>At the relevant zoom levels, the circles appear to indicate the amount of sensors in the radii of the official stations.</div>
-	</div>
-    
+
+<span id="menu">&#9776;</span>
+<div id="loading_layer">
+    <div id="loading">Loading data...</div>
+</div>
+<div id="sidebar" style="display: none;">
+    <div id="explanation">This map was build to allow Sensor.Community users to find the best location for a new sensor
+        according to researchers in the Netherlands.<br><br>They are currently building a correction algorithm based on
+        the measurements both of official stations and citizen sensors in a radius of 250 m or 1000 m.<br><br>You can
+        look for your city or your street in the search engine and then zoom in or zoom out to set the map
+        correctly.<br><br>At the relevant zoom levels, the circles appear to indicate the amount of sensors in the radii
+        of the official stations.
+    </div>
+</div>
+
 <div id="radiocontainer">
-<form id="radForm" name="radForm">
-<div>
-  <input type="radio" id="250m" name="radius" value="250"
-         checked>
-  <label for="250m">250 m</label>
-</div>
-<div>
-  <input type="radio" id="1000m" name="radius" value="1000">
-  <label for="1000m">1000 m</label>
-</div>  
-</form>
-<div id="cercle1"></div> <span id="stationsCount"></span> Stations 
-<br>
-<div id="cercle2"></div> <span id="sensorsCount"></span> Sensors
+    <form id="radForm" name="radForm">
+        <div>
+            <input checked id="250m" name="radius" type="radio"
+                   value="250">
+            <label for="250m">250 m</label>
+        </div>
+        <div>
+            <input id="1000m" name="radius" type="radio" value="1000">
+            <label for="1000m">1000 m</label>
+        </div>
+    </form>
+    <div id="cercle1"></div>
+    <span id="stationsCount"></span> Stations
+    <br>
+    <div id="cercle2"></div>
+    <span id="sensorsCount"></span> Sensors
 
-<div class ="legend" id="legend">
-<div id="legend-inner">
-<div class="gradient">
+    <div class="legend" id="legend">
+        <div class="labels">
+            <span id="min"></span>
+            <span id="max"></span>
+        </div>
+        <div class="gradient">
+        </div>
+    </div>
 </div>
-<div class="labels">
-<div class="label" style="bottom: 100%;" id ="max"><b></b></div>
-<div class="label" style="bottom: 0%;" id ="min"><b></b></div>
-</div>
-</div>
-</div>
-    
-    
 
-</div>
-    
-
-    
-    
-	<div id ='map'></div> 
+<div id='map'></div>
 </body>
 </html>
 

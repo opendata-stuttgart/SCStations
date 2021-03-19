@@ -3,21 +3,13 @@ body {
     width: 100%;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
-    /*font-size: 20px;*/
-    font-size: 1.3em;
-}
-
-h1 {
     font-size: 24px;
 }
 
-p {
-    font-size: 22px;
-}
-
-.app {
-    height: 100%;
-    width: 100%;
+@media only screen and (min-device-width: 800px) {
+    body {
+        font-size: 14px;
+    }
 }
 
 #map {
@@ -29,30 +21,43 @@ p {
     z-index: 0;
 }
 
-@media only screen and (min-device-width: 812px) {
-    body {
-        font-size: 14px;
-    }
-}
-.leaflet-popup-content {
-    padding-top: 20px;
+.leaflet-container {
+    font-size: 20px;
 }
 
+@media only screen and (min-device-width: 800px) {
+    .leaflet-container {
+        font-size: 10px;
+    }
+}
+
+
+.leaflet-popup-content h1{
+    font-size: 1.6em;
+    padding-top: 5px;
+}
+
+.leaflet-popup-content p {
+    font-size: 1.4em;
+    line-height: 1.4em;
+    margin: 5px 0;
+}
+
+
 .leaflet-popup-content-wrapper {
-    width: 250px;
+    width: 20em;
     height: auto;
     padding: 10px;
 }
+
 .leaflet-container a.leaflet-popup-close-button {
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 30px;
-    margin: 20px;
+    font-size: 2em;
+    margin: 0.7em;
 }
 
 #radiocontainer {
     width: 10em;
-    height: 18em;
+    height: 12em;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -64,7 +69,7 @@ p {
 }
 
 #radForm {
-padding-bottom:10px;  
+    padding-bottom: 10px;
 }
 
 
@@ -77,39 +82,35 @@ input[type="radio"] {
 
 #legend {
     visibility: visible;
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }
 
 
-#legend-inner {
-    position: fixed;
-    left: 30px;
+#legend .gradient {
+    position: relative;
+    left: 15px;
     bottom: 20px;
     z-index: 1001;
     pointer-events: none;
-    height: 9em;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-
-#legend-inner .gradient {
-    opacity: 0.8;
-    width: 20px;
+    height: 20px;
+    opacity: 1;
+    width: 9em;
     background: -webkit-linear-gradient(bottom, #ff0000 0%, #ffff00 50%, #00ff00 100%);
-    background: linear-gradient(to top, #ff0000 0%, #ffff00 50%, #00ff00 100%);
-    position: relative;
+    background: linear-gradient(90deg, #ff0000 0%, #ffff00 50%, #00ff00 100%);
+
 }
 
-
-#legend-inner .labels {
-    width: 150px;
+#legend .labels #min {;
     position: relative;
+    bottom: 20px;
 }
 
-#legend-inner .labels .label {
-    position: absolute;
-    -webkit-transform: translateY(50%);
-    transform: translateY(50%);
+#legend .labels #max {
+    position: relative;
+    bottom: 20px;
+    left: 90px;
 }
 
 /*
@@ -149,8 +150,7 @@ input[type="radio"] {
 #menu {
     background-color: rgba(56, 181, 173, 1);
     color: white;
-    /*font-size: 30px;*/
-    font-size: 3em;
+    font-size: 2.5em;
     border: none;
     cursor: pointer;
     top: 0;
@@ -202,7 +202,7 @@ img.leaflet-tile {
     font-weight: bold;
 }
 
-#explanation{
+#explanation {
     font-weight: normal;
     font-size: 1.4em;
     padding: 1em 4em 0 1em;
