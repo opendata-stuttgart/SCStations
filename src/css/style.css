@@ -51,7 +51,7 @@ p {
 }
 
 #radiocontainer {
-    width: 8em;
+    width: 10em;
     height: 18em;
     position: absolute;
     bottom: 0;
@@ -59,14 +59,19 @@ p {
     z-index: 100;
     background-color: white;
     padding: 20px 0 0 20px;
-    line-height: 1.3em;
+    line-height: 1.5em;
 
 }
 
+#radForm {
+padding-bottom:10px;  
+}
+
+
 input[type="radio"] {
-    -ms-transform: scale(1.5); /* IE 9 */
-    -webkit-transform: scale(1.5); /* Chrome, Safari, Opera */
-    transform: scale(1.5);
+    -ms-transform: scale(1.3); /* IE 9 */
+    -webkit-transform: scale(1.3); /* Chrome, Safari, Opera */
+    transform: scale(1.3);
 }
 
 
@@ -113,20 +118,20 @@ input[type="radio"] {
         }
 */
 #cercle1 {
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     border-radius: 10px;
     background: blue;
-    margin-left: 10px;
+    margin-left: 5px;
     display: inline-block;
 }
 
 #cercle2 {
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     border-radius: 10px;
     background: red;
-    margin-left: 10px;
+    margin-left: 5px;
     display: inline-block;
 }
 

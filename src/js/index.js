@@ -54,10 +54,13 @@ window.onload=function(){
         
          zoomLevel = map.getZoom();
         
-        if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){
-            
         boundsCountStations(stations._layers);
         boundsCountSensors(sensors._layers);
+        
+        if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){
+            
+//        boundsCountStations(stations._layers);
+//        boundsCountSensors(sensors._layers);
         countDistance();
         drawCircles();   
         stations.bringToFront();
@@ -176,13 +179,19 @@ function boundsCountStations (object){
     
     stationsInBounds.forEach(function(e){e.count250 = 0;
                                         e.count1000 = 0  });
+        
+    document.getElementById("stationsCount").innerHTML = stationsInBounds.length;
+
 }
 
 
 function boundsCountSensors (object){
     var arrayConv = Object.values(object);
     mapBounds = map.getBounds();
-    sensorsInBounds = arrayConv.filter(function (e) {if (mapBounds.contains(e._latlng)){return e}});    
+    sensorsInBounds = arrayConv.filter(function (e) {if (mapBounds.contains(e._latlng)){return e}}); 
+    
+    document.getElementById("sensorsCount").innerHTML = sensorsInBounds.length;
+
 }
 
 function countDistance (dist){
