@@ -93,7 +93,7 @@ window.onload=function(){
                       },
                       onEachFeature: function (feature, layer) {
                         
-                        var popupContent = "<h1>Official EU Station</h1><p><b>City</b> : "+feature.properties.Name+"</p><p><b>Area Classification</b> : "+feature.properties.AreaClassification+"</p><p><b>Station Classification ID</b> : "+feature.properties.StationClassification+"</p>";
+                        var popupContent = "<h1>Official EU Station</h1><p><b>City: </b>"+feature.properties.Name+"</p><p><b>Area Classification: </b> "+feature.properties.AreaClassification+"</p><p><b>Station Classification ID: </b>"+feature.properties.StationClassification+"</p>";
                         layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
                       }}).addTo(map);
     
@@ -120,7 +120,7 @@ window.onload=function(){
                           
                           if (feature.properties.indoor == 0) {position="outdoor"}else{position="indoor"};
                         
-                        var popupContent = "<h1>Sensor.Community #"+feature.properties.id+"</h1><p><b>Type</b> : "+feature.properties.type+"</p><p><b>Position</b> : "+position+"</p>";
+                        var popupContent = "<h1>Sensor.Community #"+feature.properties.id+"</h1><p><b>Type: </b>"+feature.properties.type+"</p><p><b>Position: </b>"+position+"</p>";
                         layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
                       }}).addTo(map);
                         
