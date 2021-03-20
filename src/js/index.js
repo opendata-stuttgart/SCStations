@@ -58,16 +58,11 @@ window.onload=function(){
         boundsCountSensors(sensors._layers);
         
         if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){
-            
-//        boundsCountStations(stations._layers);
-//        boundsCountSensors(sensors._layers);
         countDistance();
         drawCircles();   
         stations.bringToFront();
         sensors.bringToFront();
-        };
-     
-                      
+        };                   
 });
     
     
@@ -114,14 +109,10 @@ window.onload=function(){
                         fillOpacity: 1})
                       },
                       onEachFeature: function (feature, layer) {
-                          
-                      
                          var position;
-                          
-                          if (feature.properties.indoor == 0) {position="outdoor"}else{position="indoor"};
-                        
-                        var popupContent = "<h1>Sensor.Community #"+feature.properties.id+"</h1><p><b>Type: </b>"+feature.properties.type+"</p><p><b>Position: </b>"+position+"</p>";
-                        layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
+                         if (feature.properties.indoor == 0) {position="outdoor"}else{position="indoor"};
+                         var popupContent = "<h1>Sensor.Community #"+feature.properties.id+"</h1><p><b>Type: </b>"+feature.properties.type+"</p><p><b>Position: </b>"+position+"</p>";
+                         layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
                       }}).addTo(map);
                         
             boundsCountSensors(sensors._layers);
@@ -129,7 +120,6 @@ window.onload=function(){
             drawCircles ();  
             stations.bringToFront();
             sensors.bringToFront();
-            
             document.getElementById("loading_layer").style.display ="none";
             document.getElementById("radiocontainer").style.display ="block";
                                 
@@ -159,8 +149,9 @@ for (var i = 0; i < radios.length; i++) {
         if (this !== prev) {
             prev = this.value;
             console.log(prev);
-            document.getElementById('legend').style.visibility = 'hidden'
+            document.getElementById('legend').style.visibility = 'hidden';
             circleRadii.clearLayers();
+            if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){countDistance();};
             drawCircles(); 
         stations.bringToFront();
         sensors.bringToFront();
@@ -194,7 +185,7 @@ function boundsCountSensors (object){
 
 }
 
-function countDistance (dist){
+function countDistance(){
     stationsInBounds.forEach(function(e){
     sensorsInBounds.forEach(function(i){if (i._latlng.distanceTo(e._latlng)<=250){e.count250 +=1};
                                            if (i._latlng.distanceTo(e._latlng)<=1000){e.count1000 +=1};
