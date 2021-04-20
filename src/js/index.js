@@ -14,8 +14,8 @@ import "leaflet-mouse-position";
 let locations;
 var map;
 var tiles;
-var cooCenter = [50.9414,6.9589];
-var zoomLevel = 15;
+var cooCenter = [51.5072, -0.1275];
+var zoomLevel = 13;
 
 var stations;
 var radius;
@@ -57,7 +57,7 @@ window.onload=function(){
         boundsCountStations(stations._layers);
         boundsCountSensors(sensors._layers);
         
-        if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){
+        if ((prev == 250 && zoomLevel > 12)||(prev == 1000 && zoomLevel > 10)){
         countDistance();
         drawCircles();   
         stations.bringToFront();
@@ -131,7 +131,7 @@ window.onload=function(){
 map = L.map('map',{ zoomControl:true,minZoom:1,doubleClickZoom:false});
 
 tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-			attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+			attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors<br/><span style="font-size:120%">SC Stations: <a href="https://sensor.community/" style="color: red">Sensor.Community</a> contributors</span>',
 			maxZoom: 18}).addTo(map);
 
 var searchControl = esri_geo.geosearch({useMapBounds:false, zoomToResult:true}).addTo(map);
@@ -151,7 +151,7 @@ for (var i = 0; i < radios.length; i++) {
             console.log(prev);
             document.getElementById('legend').style.visibility = 'hidden';
             circleRadii.clearLayers();
-            if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){countDistance();};
+            if ((prev == 250 && zoomLevel > 12)||(prev == 1000 && zoomLevel > 10)){countDistance();};
             drawCircles(); 
         stations.bringToFront();
         sensors.bringToFront();
@@ -195,7 +195,7 @@ function countDistance(){
 
 function drawCircles(){
     
-    if(prev == 250 && zoomLevel > 14){
+    if(prev == 250 && zoomLevel > 12){
         
         console.log(stationsInBounds);
             max = Math.max.apply(Math, stationsInBounds.map(function(o) { return o.count250; }));
@@ -205,7 +205,7 @@ function drawCircles(){
         
     };
     
-    if(prev == 1000 && zoomLevel > 12){
+    if(prev == 1000 && zoomLevel > 10){
         
         console.log(stationsInBounds);
         
@@ -216,7 +216,7 @@ function drawCircles(){
     };
     
     
-    if(((prev == 1000 && zoomLevel > 12) || (prev == 250 && zoomLevel > 14)) && (Math.abs(min) !== Infinity || Math.abs(max) !== Infinity)){
+    if(((prev == 1000 && zoomLevel > 10) || (prev == 250 && zoomLevel > 12)) && (Math.abs(min) !== Infinity || Math.abs(max) !== Infinity)){
         
     console.log("CALLED");
     
