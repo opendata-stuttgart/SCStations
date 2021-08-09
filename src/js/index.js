@@ -37,6 +37,8 @@ var min=0;
 
 var mobile = mobileCheck ();
 
+var searchGeo = false;
+
 
 console.log('mobile: ' + mobile);
 
@@ -66,9 +68,15 @@ window.onload=function(){
 });
     
     
-	map.on('zoomend', function() {console.log('zoomend')});
+	map.on('zoomend', function() {
+        console.log('zoomend')
+        if (searchGeo == true && map.getZoom()<13){
+            map.setZoom(15);
+            searchGeo = false;  
+        }
+    });
     
-    fetch("./../json/eustations.json")
+    fetch("./../json/stations.json")
         .then(function(response) {
         return response.json();
         })
@@ -87,9 +95,14 @@ window.onload=function(){
                         fillOpacity: 1})
                       },
                       onEachFeature: function (feature, layer) {
-                        
-                        var popupContent = "<h1>Official EU Station</h1><p><b>City: </b>"+feature.properties.Name+"</p><p><b>Area Classification: </b> "+feature.properties.AreaClassification+"</p><p><b>Station Classification ID: </b>"+feature.properties.StationClassification+"</p>";
-                        layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
+                          if (feature.properties.Source == "EEA") { var popupContent = "<h1>Official EU Station</h1><p><b>City: </b>" + feature.properties.Name + "</p><p><b>Area Classification: </b> " + feature.properties.AreaClassification + "</p><p><b>Station Classification ID: </b>" + feature.properties.StationClassification + "</p>"; };
+                          if (feature.properties.Source == "AQMD") {
+                              var monitorString = "";
+                              feature.properties.monitors.forEach(function (e) { monitorString += e + "<br>" });
+                              var popupContent = "<h1>Official AQMD Station</h1><p><b>Name: </b>" + feature.properties.siteName + "</p><p><b>Monitoring: </b> " + monitorString + "</p>";
+                          };
+
+                        layer.bindPopup(popupContent, { closeButton: true, maxWidth: "auto" });
                       }}).addTo(map);
     
             boundsCountStations(stations._layers);
@@ -135,6 +148,11 @@ tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 			maxZoom: 18}).addTo(map);
 
 var searchControl = esri_geo.geosearch({useMapBounds:false, zoomToResult:true}).addTo(map);
+
+searchControl.on('results', function (data) {
+    console.log(data);
+    searchGeo = true;
+    });
 
 new L.Hash(map);
 
