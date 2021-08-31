@@ -14,8 +14,8 @@ import "leaflet-mouse-position";
 let locations;
 var map;
 var tiles;
-var cooCenter = [50.9414,6.9589];
-var zoomLevel = 15;
+var cooCenter = [0,0];
+var zoomLevel = 2;
 
 var stations;
 var radius;
@@ -94,7 +94,7 @@ window.onload=function(){
                         stroke:false,
                         fillOpacity: 1})
                       },
-                      onEachFeature: function (feature, layer) {
+                onEachFeature: function (feature, layer) {
                           if (feature.properties.Source == "EEA") { var popupContent = "<h1>Official EU Station</h1><p><b>City: </b>" + feature.properties.Name + "</p><p><b>Area Classification: </b> " + feature.properties.AreaClassification + "</p><p><b>Station Classification ID: </b>" + feature.properties.StationClassification + "</p>"; };
                           if (feature.properties.Source == "AQMD") {
                               var monitorString = "";
@@ -107,7 +107,7 @@ window.onload=function(){
     
             boundsCountStations(stations._layers);
         
-          		api.getData("https://maps.sensor.community/data/v2/data.dust.min.json").then(function (result) {
+          api.getData("https://maps.sensor.community/data/v2/data.dust.min.json").then(function (result) {
             locations = result;            
           sensors = L.geoJSON(locations,{
                       pointToLayer: function (feature, latlng) {
@@ -128,8 +128,9 @@ window.onload=function(){
                          layer.bindPopup(popupContent,{closeButton:true, maxWidth: "auto"});
                       }}).addTo(map);
                         
-            boundsCountSensors(sensors._layers);
-            countDistance();
+              boundsCountSensors(sensors._layers);
+            if ((prev == 250 && zoomLevel > 14)||(prev == 1000 && zoomLevel > 12)){countDistance();};
+            //countDistance();
             drawCircles ();  
             stations.bringToFront();
             sensors.bringToFront();
