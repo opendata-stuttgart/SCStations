@@ -56,7 +56,7 @@ body {
 }
 
 #radiocontainer {
-    width: 10em;
+    width: 15em;
     height: 12em;
     position: absolute;
     bottom: 0;
@@ -96,7 +96,7 @@ input[type="radio"] {
     pointer-events: none;
     height: 20px;
     opacity: 1;
-    width: 9em;
+    width: 13em;
     background: -webkit-linear-gradient(bottom, #ff0000 0%, #ffff00 50%, #00ff00 100%);
     background: linear-gradient(90deg, #ff0000 0%, #ffff00 50%, #00ff00 100%);
 
